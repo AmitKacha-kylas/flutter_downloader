@@ -368,45 +368,31 @@ class DownloadWorker(context: Context, params: WorkerParameters) :
                         }
                     }
                 }
-                log("fileName kylasssss = $actualFilename")
+                log("fileName k = $actualFilename")
                 taskDao?.updateTask(id.toString(), actualFilename, contentType)
 
                 // opens input stream from the HTTP connection
                 inputStream = httpConn.inputStream
-                val savedFilePath: String = ""
+                val savedFilePath: String?
                 // opens an output stream to save into file
                 // there are two case:
                 if (isResume) {
                     // 1. continue downloading (append data to partial downloaded file)
                     savedFilePath = savedDir + File.separator + actualFilename
                     outputStream = FileOutputStream(savedFilePath, true)
-                    log("DownloaderKylas isResume downloaden")
-
                 } else {
-                    log("DownloaderKylas new downloaden")
-
                     // 2. new download, create new file
                     // there are two case according to Android SDK version and save path
                     // From Android 11 onwards, file is only downloaded to app-specific directory (internal storage)
                     // or public shared download directory (external storage).
                     // The second option will ignore `savedDir` parameter.
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && saveInPublicStorage) {
-                        log("DownloaderKylas SDK_INT more than Q version")
-
                         val uri = createFileInPublicDownloadsDir(actualFilename, contentType)
-                        if (uri != null) {
-                            savedFilePath = uri.toString()  // Store URI instead of file path
-                            outputStream = context.contentResolver.openOutputStream(uri, "w")
-                            log("DownloaderKylas Success to create file in public storage.")
-
-                        } else {
-                            log("DownloaderKylas Failed to create file in public storage.")
-                        }
+                        savedFilePath = getMediaStoreEntryPathApi29(uri!!) + "/KylasDownloads"
+                        outputStream = context.contentResolver.openOutputStream(uri, "w")
                     } else {
-                        log("DownloaderKylas SDK_INT leass than Q version or saveInPublicStorage false savedDir $savedDir ")
-log("savedDir -=-=- $savedDir")
                         val file = createFileInAppSpecificDir(actualFilename!!, savedDir)
-                        savedFilePath = file!!.path
+                        savedFilePath = file!!.path + "/KylasDownloads"
                         outputStream = FileOutputStream(file, false)
                     }
                 }
@@ -536,11 +522,10 @@ log("savedDir -=-=- $savedDir")
     private fun createFileInPublicDownloadsDir(filename: String?, mimeType: String?): Uri? {
         val collection: Uri = MediaStore.Downloads.EXTERNAL_CONTENT_URI
         val values = ContentValues()
-        values.put(MediaStore.Downloads.DISPLAY_NAME, "KylasMedia")
-        values.put(MediaStore.Downloads.MIME_TYPE, "vnd.android.document/directory")
+        values.put(MediaStore.Downloads.DISPLAY_NAME, filename)
+        values.put(MediaStore.Downloads.MIME_TYPE, mimeType)
         values.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/KylasMedia")
         val contentResolver = applicationContext.contentResolver
-log("DownloaderKylas createFileInPublicDownloadsDir: ${contentResolver.insert(collection, values)}")
         try {
             return contentResolver.insert(collection, values)
         } catch (e: Exception) {
