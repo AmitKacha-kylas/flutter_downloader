@@ -368,7 +368,7 @@ class DownloadWorker(context: Context, params: WorkerParameters) :
                         }
                     }
                 }
-                log("fileName kylas = $actualFilename")
+                log("fileName = $actualFilename")
                 taskDao?.updateTask(id.toString(), actualFilename, contentType)
 
                 // opens input stream from the HTTP connection
@@ -388,11 +388,11 @@ class DownloadWorker(context: Context, params: WorkerParameters) :
                     // The second option will ignore `savedDir` parameter.
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && saveInPublicStorage) {
                         val uri = createFileInPublicDownloadsDir(actualFilename, contentType)
-                        savedFilePath = getMediaStoreEntryPathApi29(uri!!) + "KylasMedia"
+                        savedFilePath = getMediaStoreEntryPathApi29(uri!!)
                         outputStream = context.contentResolver.openOutputStream(uri, "w")
                     } else {
                         val file = createFileInAppSpecificDir(actualFilename!!, savedDir)
-                        savedFilePath = file!!.path + "KylasMedia"
+                        savedFilePath = file!!.path
                         outputStream = FileOutputStream(file, false)
                     }
                 }
