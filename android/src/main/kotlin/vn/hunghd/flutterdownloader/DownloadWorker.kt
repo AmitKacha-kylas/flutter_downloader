@@ -388,11 +388,11 @@ class DownloadWorker(context: Context, params: WorkerParameters) :
                     // The second option will ignore `savedDir` parameter.
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && saveInPublicStorage) {
                         val uri = createFileInPublicDownloadsDir(actualFilename, contentType)
-                        savedFilePath = getMediaStoreEntryPathApi29(uri!!) + "/KylasDownloads"
+                        savedFilePath = getMediaStoreEntryPathApi29(uri!!)
                         outputStream = context.contentResolver.openOutputStream(uri, "w")
                     } else {
                         val file = createFileInAppSpecificDir(actualFilename!!, savedDir)
-                        savedFilePath = file!!.path + "/KylasDownloads"
+                        savedFilePath = file!!.path
                         outputStream = FileOutputStream(file, false)
                     }
                 }
