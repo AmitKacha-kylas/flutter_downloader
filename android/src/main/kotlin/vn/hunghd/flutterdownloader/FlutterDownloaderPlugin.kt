@@ -170,8 +170,19 @@ class FlutterDownloaderPlugin : MethodChannel.MethodCallHandler, FlutterPlugin {
         val openFileFromNotification: Boolean = call.requireArgument("open_file_from_notification")
         val requiresStorageNotLow: Boolean = call.requireArgument("requires_storage_not_low")
         val saveInPublicStorage: Boolean = call.requireArgument("save_in_public_storage")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            // Use MediaStore API for Android 10+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+            val kylasDir = File(downloadsDir, "KylasMedia")
+
+            if (!kylasDir.exists()) {
+                if (!kylasDir.mkdirs()) {
+                    Log.e("FlutterDownloader", "Failed to create directory: ${kylasDir.absolutePath}")
+                }
+            }
+
+            savedDir = kylasDir.absolutePath
+        } else {
+            // Android 10+ (Use MediaStore API)
             val contentValues = ContentValues().apply {
                 put(MediaStore.MediaColumns.DISPLAY_NAME, "KylasMedia")
                 put(MediaStore.MediaColumns.MIME_TYPE, "vnd.android.document/directory")
@@ -184,23 +195,12 @@ class FlutterDownloaderPlugin : MethodChannel.MethodCallHandler, FlutterPlugin {
             savedDir = if (uri != null) {
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath + "/KylasMedia"
             } else {
-                Log.e("DownloadPath", "Failed to create directory using MediaStore API")
+                Log.e("FlutterDownloader", "Failed to create directory using MediaStore API")
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath
             }
-
-        } else {
-            // Use old method for Android 9 and below
-            val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-            val kylasDir = File(downloadsDir, "KylasMedia")
-
-            if (!kylasDir.exists()) {
-                if (!kylasDir.mkdirs()) {
-                    Log.e("DownloadPath", "Failed to create directory: ${kylasDir.absolutePath}")
-                }
-            }
-            savedDir = kylasDir.absolutePath
         }
-        Log.d("DownloadPath", "Final savedDir: $savedDir")
+
+        Log.d("FlutterDownloader", "Final savedDir: $savedDir")
 
         val allowCellular: Boolean = call.requireArgument("allow_cellular")
         val request: WorkRequest = buildRequest(
