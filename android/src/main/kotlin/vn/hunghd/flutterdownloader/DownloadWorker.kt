@@ -524,7 +524,7 @@ class DownloadWorker(context: Context, params: WorkerParameters) :
         val values = ContentValues()
         values.put(MediaStore.Downloads.DISPLAY_NAME, filename)
         values.put(MediaStore.Downloads.MIME_TYPE, mimeType)
-        values.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+        values.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/KylasMedia")
         val contentResolver = applicationContext.contentResolver
         try {
             return contentResolver.insert(collection, values)
