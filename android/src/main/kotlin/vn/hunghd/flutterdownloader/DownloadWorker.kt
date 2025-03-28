@@ -368,7 +368,7 @@ class DownloadWorker(context: Context, params: WorkerParameters) :
                         }
                     }
                 }
-                log("fileName = $actualFilename")
+                log("fileName kylasssss = $actualFilename")
                 taskDao?.updateTask(id.toString(), actualFilename, contentType)
 
                 // opens input stream from the HTTP connection
@@ -380,7 +380,11 @@ class DownloadWorker(context: Context, params: WorkerParameters) :
                     // 1. continue downloading (append data to partial downloaded file)
                     savedFilePath = savedDir + File.separator + actualFilename
                     outputStream = FileOutputStream(savedFilePath, true)
+                    log("DownloaderKylas", "isResume downloaden")
+
                 } else {
+                    log("DownloaderKylas", "new downloaden")
+
                     // 2. new download, create new file
                     // there are two case according to Android SDK version and save path
                     // From Android 11 onwards, file is only downloaded to app-specific directory (internal storage)
@@ -399,8 +403,8 @@ class DownloadWorker(context: Context, params: WorkerParameters) :
                             log("DownloaderKylas", "Failed to create file in public storage.")
                         }
                     } else {
-                        log("DownloaderKylas", "SDK_INT leass than Q version or saveInPublicStorage false ")
-
+                        log("DownloaderKylas", "SDK_INT leass than Q version or saveInPublicStorage false savedDir $savedDir ")
+log("savedDir -=-=- $savedDir")
                         val file = createFileInAppSpecificDir(actualFilename!!, savedDir)
                         savedFilePath = file!!.path
                         outputStream = FileOutputStream(file, false)
