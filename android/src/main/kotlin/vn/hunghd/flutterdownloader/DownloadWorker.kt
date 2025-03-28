@@ -387,19 +387,19 @@ class DownloadWorker(context: Context, params: WorkerParameters) :
                     // or public shared download directory (external storage).
                     // The second option will ignore `savedDir` parameter.
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && saveInPublicStorage) {
-                        Log.i("DownloaderKylas", "SDK_INT more than Q version")
+                        log("DownloaderKylas", "SDK_INT more than Q version")
 
                         val uri = createFileInPublicDownloadsDir(actualFilename, contentType)
                         if (uri != null) {
                             savedFilePath = uri.toString()  // Store URI instead of file path
                             outputStream = context.contentResolver.openOutputStream(uri, "w")
-                            Log.i("DownloaderKylas", "Success to create file in public storage.")
+                            log("DownloaderKylas", "Success to create file in public storage.")
 
                         } else {
-                            Log.e("DownloaderKylas", "Failed to create file in public storage.")
+                            log("DownloaderKylas", "Failed to create file in public storage.")
                         }
                     } else {
-                        Log.i("DownloaderKylas", "SDK_INT leass than Q version or saveInPublicStorage false ")
+                        log("DownloaderKylas", "SDK_INT leass than Q version or saveInPublicStorage false ")
 
                         val file = createFileInAppSpecificDir(actualFilename!!, savedDir)
                         savedFilePath = file!!.path
@@ -536,7 +536,7 @@ class DownloadWorker(context: Context, params: WorkerParameters) :
         values.put(MediaStore.Downloads.MIME_TYPE, "vnd.android.document/directory")
         values.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/KylasMedia")
         val contentResolver = applicationContext.contentResolver
-
+log("DownloaderKylas", "createFileInPublicDownloadsDir: ${contentResolver.insert(collection, values)}")
         try {
             return contentResolver.insert(collection, values)
         } catch (e: Exception) {
