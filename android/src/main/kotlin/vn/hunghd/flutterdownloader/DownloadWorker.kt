@@ -387,14 +387,20 @@ class DownloadWorker(context: Context, params: WorkerParameters) :
                     // or public shared download directory (external storage).
                     // The second option will ignore `savedDir` parameter.
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && saveInPublicStorage) {
+                        Log.i("DownloaderKylas", "SDK_INT more than Q version")
+
                         val uri = createFileInPublicDownloadsDir(actualFilename, contentType)
                         if (uri != null) {
                             savedFilePath = uri.toString()  // Store URI instead of file path
                             outputStream = context.contentResolver.openOutputStream(uri, "w")
+                            Log.i("DownloaderKylas", "Success to create file in public storage.")
+
                         } else {
-                            Log.e("FileCreation", "Failed to create file in public storage.")
+                            Log.e("DownloaderKylas", "Failed to create file in public storage.")
                         }
                     } else {
+                        Log.i("DownloaderKylas", "SDK_INT leass than Q version or saveInPublicStorage false ")
+
                         val file = createFileInAppSpecificDir(actualFilename!!, savedDir)
                         savedFilePath = file!!.path
                         outputStream = FileOutputStream(file, false)
