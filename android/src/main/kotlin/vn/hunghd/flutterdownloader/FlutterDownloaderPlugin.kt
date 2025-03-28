@@ -95,12 +95,13 @@ class FlutterDownloaderPlugin : MethodChannel.MethodCallHandler, FlutterPlugin {
         allowCellular: Boolean
     ): WorkRequest {
         return OneTimeWorkRequest.Builder(DownloadWorker::class.java)
-            .setConstraints(
-                Constraints.Builder()
-                    .setRequiresStorageNotLow(requiresStorageNotLow)
-                    .setRequiredNetworkType(if (allowCellular) NetworkType.CONNECTED else NetworkType.UNMETERED)
-                    .build()
-            )
+            /// TODO : for specific device downlaod not work like "Oneplus 10 R, Oppo etc"
+//            .setConstraints(
+//                Constraints.Builder()
+//                    .setRequiresStorageNotLow(requiresStorageNotLow)
+//                    .setRequiredNetworkType(if (allowCellular) NetworkType.CONNECTED else NetworkType.UNMETERED)
+//                    .build()
+//            )
             .addTag(TAG)
             .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.SECONDS)
             .setInputData(
